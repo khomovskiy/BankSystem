@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,15 +17,14 @@ namespace DBBankSystemControlLibrary
         public DbSet<User> Users { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<BankAccount> BankAccounts { get; set; }
-
-        private DBBSContext() : base(_connStr)
+        private DBBSContext() : base(_connStr) { }
+        public static DBBSContext GetInstance(string connStr = null)
         {
-        }
-
-        public static DBBSContext GetInstance(string connStr)
-        {
-            _connStr = connStr;
-            if (Instance is null) Instance = new DBBSContext();
+            if (Instance is null || !(connStr is null))
+            {
+                _connStr = connStr;
+                Instance = new DBBSContext();
+            }
             return Instance;
         }
     }
@@ -36,13 +36,9 @@ namespace DBBankSystemControlLibrary
         public string Password { get; set; }
         public bool IsBlocked { get; set; }
         public DateTime CreateDateTime { get; set; }
+        public virtual ICollection<BankAccount> BankAccounts { get; set; }
 
-        public ICollection<BankAccount> BankAccounts { get; set; }
-
-        public Account()
-        {
-            BankAccounts = new List<BankAccount>();
-        }
+        
     }
 
     public class User
@@ -62,15 +58,16 @@ namespace DBBankSystemControlLibrary
         [Index(IsUnique = true)]
         public int? AccountId { get; set; }
 
+        
     }
 
     public class BankAccount
     {
         public int Id { get; set; }
         public DateTime Created { get; set; }
-        public decimal Balance { get; set; }
         public decimal CreditFunds { get; set; }
         public decimal PersonalFunds { get; set; }
         public bool IsClosed { get; set; }
+        
     }
 }

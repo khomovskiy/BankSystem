@@ -7,8 +7,45 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BankSystemPersonnel"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Bank System Manager" Height="450" Width="800">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" ></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel Margin="5"
+                Grid.Column="0">
+            <TextBox x:Name="SearchQueryBox"
+                     mah:TextBoxHelper.AutoWatermark="True"
+                     mah:TextBoxHelper.Watermark="Поиск"/>
+            <Button x:Name="SearchUser"
+                    Click="SearchUser_OnClick">Найти пользователя</Button>
+            <Button x:Name="SearchAccount"
+                    Click="SearchAccount_OnClick">Найти аккаунт</Button>
+            <Button x:Name="ShowAllUser"
+                    Click="ShowAllUser_OnClick">Показать всех пользователей</Button>
+            <Button x:Name="ShowAllAccounts"
+                    Click="ShowAllAccounts_OnClick">Показать все аккаунты</Button>
+        </StackPanel>
+        <DataGrid Grid.Row="0" 
+                  Grid.Column="1" 
+                  x:Name="ListUsers" 
+                  CanUserAddRows="False"
+                  CellEditEnding="ListUsers_OnCellEditEnding"
+                  CanUserSortColumns="True"
+                  AutoGeneratingColumn="ListUsers_OnAutoGeneratingColumn"
+                  Margin="5">
+            <DataGrid.ContextMenu>
+                <ContextMenu IsOpen="False">
+                    <MenuItem Header="Показать аккаунт"
+                              x:Name="ShowAccountMenuItem"
+                              Click="ShowAccountMenuItem_OnClick"></MenuItem>
+                    <MenuItem Header="Показать счета"
+                              x:Name="ShowBankAccountMenuItem"
+                              Click="ShowBankAccountMenuItem_OnClick"></MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
     </Grid>
 </mah:MetroWindow>
+
