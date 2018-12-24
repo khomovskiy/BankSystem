@@ -17,6 +17,8 @@ namespace DBBankSystemControlLibrary
         public DbSet<User> Users { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<BankAccount> BankAccounts { get; set; }
+        public DbSet<AccountLimit> AccountLimits { get; set; }
+        public DbSet<CreditRequest> CreditRequests { get; set; }
         private DBBSContext() : base(_connStr) { }
         public static DBBSContext GetInstance(string connStr = null)
         {
@@ -35,9 +37,9 @@ namespace DBBankSystemControlLibrary
         public string Login { get; set; }
         public string Password { get; set; }
         public bool IsBlocked { get; set; }
-        public DateTime CreateDateTime { get; set; }
+        public DateTime Created { get; set; }
         public virtual ICollection<BankAccount> BankAccounts { get; set; }
-
+        public AccountLimit AccountLimit { get; set; }
         
     }
 
@@ -69,5 +71,26 @@ namespace DBBankSystemControlLibrary
         public decimal PersonalFunds { get; set; }
         public bool IsClosed { get; set; }
         
+    }
+
+    public class AccountLimit
+    {
+        public int Id { get; set; }
+        public DateTime Created { get; set; }
+        public decimal CashLimit { get; set; } 
+        public decimal TranferLimit { get; set; }
+        
+    }
+
+    public class CreditRequest
+    {
+        public int Id { get; set; }
+        public decimal CreditSize { get; set; }
+        public DateTime Created { get; set; }
+        [Index(IsUnique = true)]
+        public int? BankAccountId { get; set; }
+        public BankAccount BankAccount { get; set; }
+        public bool IsApproved { get; set; }
+        public bool IsClosed { get; set; }
     }
 }

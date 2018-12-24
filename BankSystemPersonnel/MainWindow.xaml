@@ -15,37 +15,67 @@
         </Grid.ColumnDefinitions>
         <StackPanel Margin="5"
                 Grid.Column="0">
-            <TextBox x:Name="SearchQueryBox"
-                     mah:TextBoxHelper.AutoWatermark="True"
-                     mah:TextBoxHelper.Watermark="Поиск"/>
-            <Button x:Name="SearchUser"
-                    Click="SearchUser_OnClick">Найти пользователя</Button>
-            <Button x:Name="SearchAccount"
-                    Click="SearchAccount_OnClick">Найти аккаунт</Button>
+            <Border BorderThickness="3"
+                    BorderBrush="LightGray">
+                <StackPanel Orientation="Vertical">
+                    <TextBox x:Name="SearchQueryBox"
+                         mah:TextBoxHelper.AutoWatermark="True"
+                         mah:TextBoxHelper.Watermark="Поиск"
+                         mah:TextBoxHelper.ClearTextButton="True"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="SearchUser"
+                        Click="SearchUser_OnClick">Поиск пользователя</Button>
+                        <Button x:Name="SearchAccount"
+                            Click="SearchAccount_OnClick">Поиск аккаунта</Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
             <Button x:Name="ShowAllUser"
-                    Click="ShowAllUser_OnClick">Показать всех пользователей</Button>
+                    Click="ShowAllUser_OnClick"
+                    Margin="0,2,0,2">Показать всех пользователей</Button>
             <Button x:Name="ShowAllAccounts"
-                    Click="ShowAllAccounts_OnClick">Показать все аккаунты</Button>
+                    Click="ShowAllAccounts_OnClick"
+                    Margin="0,2,0,2">Показать все аккаунты</Button>
+            <Button x:Name="ShowAllDebtor"
+                    Click="ShowAllDebtor_OnClick"
+                    Margin="0,2,0,2">Показать все счета-должники</Button>
+            <Button x:Name="ShowAllVIPClients"
+                    Click="ShowAllVIPClients_OnClick"
+                    Margin="0,2,0,2">Показать все VIP-счета</Button>
+            <Button x:Name="ShowActualCreditRequests"
+                    Click="ShowActualCreditRequests_OnClick"
+                    Margin="0,2,0,2">Показать запросы на кредит</Button>
         </StackPanel>
-        <DataGrid Grid.Row="0" 
-                  Grid.Column="1" 
+        <Border Grid.Row="0" 
+                Grid.Column="1"
+                BorderThickness="3"
+                BorderBrush="LightGray"
+                Margin="5">
+            <DataGrid  
                   x:Name="ListUsers" 
                   CanUserAddRows="False"
                   CellEditEnding="ListUsers_OnCellEditEnding"
                   CanUserSortColumns="True"
                   AutoGeneratingColumn="ListUsers_OnAutoGeneratingColumn"
-                  Margin="5">
-            <DataGrid.ContextMenu>
-                <ContextMenu IsOpen="False">
-                    <MenuItem Header="Показать аккаунт"
+                  GridLinesVisibility="All">
+                <DataGrid.ContextMenu>
+                    <ContextMenu x:Name="ListUsersContextMenu">
+                        <MenuItem Header="Показать пользователя"
+                              x:Name="ShowUserMenuItem"
+                              Click="ShowUserMenuItem_OnClick"></MenuItem>
+                        <MenuItem Header="Показать аккаунт"
                               x:Name="ShowAccountMenuItem"
                               Click="ShowAccountMenuItem_OnClick"></MenuItem>
-                    <MenuItem Header="Показать счета"
+                        <MenuItem Header="Показать счет"
                               x:Name="ShowBankAccountMenuItem"
                               Click="ShowBankAccountMenuItem_OnClick"></MenuItem>
-                </ContextMenu>
-            </DataGrid.ContextMenu>
-        </DataGrid>
+                        <MenuItem Header="Назад"
+                              x:Name="BackMenuItem"
+                              Click="BackMenuItem_OnClick"></MenuItem>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+        </Border>
     </Grid>
 </mah:MetroWindow>
 
