@@ -19,6 +19,7 @@ namespace DBBankSystemControlLibrary
         public DbSet<BankAccount> BankAccounts { get; set; }
         public DbSet<AccountLimit> AccountLimits { get; set; }
         public DbSet<CreditRequest> CreditRequests { get; set; }
+        public DbSet<PersonnelAccount> PersonnelAccounts { get; set; }
         private DBBSContext() : base(_connStr) { }
         public static DBBSContext GetInstance(string connStr = null)
         {
@@ -60,10 +61,16 @@ namespace DBBankSystemControlLibrary
         public Account Account { get; set; }
         [Index(IsUnique = true)]
         public int? AccountId { get; set; }
-        
-
-        
     }
+
+    public class PersonnelAccount
+    {
+        public int Id { get; set; }
+        public string Login { get; set; }
+        public string Password { get; set; }
+        public bool IsBlocked { get; set; }
+        public DateTime Created { get; set; }
+}
 
     public class BankAccount
     {

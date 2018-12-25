@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -39,10 +40,34 @@ namespace BankSystemPersonnel
             PersonellControl.InitializeDBControl();
             InitializeComponent();
             //SetDBData();
+            PersonellAuthorization();
             var dpd = DependencyPropertyDescriptor.FromProperty(ItemsControl.ItemsSourceProperty, typeof(DataGrid));
-            if (dpd != null)
+            dpd?.AddValueChanged(ListUsers, ThisIsCalledWhenPropertyIsChanged);
+        }
+
+        private async void PersonellAuthorization()
+        {
+            while (true)
             {
-                dpd.AddValueChanged(ListUsers, ThisIsCalledWhenPropertyIsChanged);
+                var dialres = await this.ShowLoginAsync("Авторизация", "Введите учетные данные для входа",
+                    new LoginDialogSettings
+                    {
+                        ColorScheme = MetroDialogOptions.ColorScheme,
+                        EnablePasswordPreview = true,
+                        UsernameWatermark = "Имя пользователя",
+                        PasswordWatermark = "Пароль"
+                    });
+                if (dialres is null) continue;
+                var acc = DBBSContext.GetInstance().PersonnelAccounts
+                    .FirstOrDefault(a => a.Login == dialres.Username && a.Password == dialres.Password);
+                if (acc is null)
+                {
+                    var msg = await this.ShowMessageAsync("Ошибка", "Неверные имя пользователя или пароль", MessageDialogStyle.Affirmative);
+                }
+                else
+                {
+                    return;
+                }
             }
         }
 
@@ -167,6 +192,13 @@ namespace BankSystemPersonnel
                 Created = DateTime.Now,
                 CreditSize = 500m
             });
+            PersonnelAccount pAcc = new PersonnelAccount
+            {
+                Created = DateTime.Now,
+                Login = "admin",
+                Password = "admin"
+            };
+            DBBSContext.GetInstance().PersonnelAccounts.Add(pAcc);
             DBBSContext.GetInstance().SaveChanges();
         }
 
