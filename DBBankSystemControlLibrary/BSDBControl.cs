@@ -20,6 +20,7 @@ namespace DBBankSystemControlLibrary
         public DbSet<AccountLimit> AccountLimits { get; set; }
         public DbSet<CreditRequest> CreditRequests { get; set; }
         public DbSet<PersonnelAccount> PersonnelAccounts { get; set; }
+        public DbSet<TransactionHistory> TransactionHistories { get; set; }
         private DBBSContext() : base(_connStr) { }
         public static DBBSContext GetInstance(string connStr = null)
         {
@@ -75,11 +76,15 @@ namespace DBBankSystemControlLibrary
     public class BankAccount
     {
         public int Id { get; set; }
+        public string Number { get; set; }
         public DateTime Created { get; set; }
         public decimal CreditFunds { get; set; }
         public decimal PersonalFunds { get; set; }
         public bool IsClosed { get; set; }
-        
+        public override string ToString()
+        {
+            return Number;
+        }
     }
 
     public class AccountLimit
@@ -90,12 +95,20 @@ namespace DBBankSystemControlLibrary
         
     }
 
+    public class TransactionHistory
+    {
+        public int Id { get; set; }
+        public string FromBankAccount { get; set; }
+        public string ToBankAccount { get; set; }
+        public decimal RemittanceAmount { get; set; }
+        public DateTime Created { get; set; }
+    }
+
     public class CreditRequest
     {
         public int Id { get; set; }
         public decimal CreditSize { get; set; }
         public DateTime Created { get; set; }
-        [Index(IsUnique = true)]
         public int? BankAccountId { get; set; }
         public BankAccount BankAccount { get; set; }
         public bool IsApproved { get; set; }

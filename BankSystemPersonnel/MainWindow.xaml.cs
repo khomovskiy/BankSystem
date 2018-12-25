@@ -30,21 +30,17 @@ namespace BankSystemPersonnel
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-
         PersonellControl personell = new PersonellControl();
         private IEnumerable _itemSourceBackUp;
-
-
         public MainWindow()
         {
             PersonellControl.InitializeDBControl();
             InitializeComponent();
-            //SetDBData();
+            SetDBData();
             PersonellAuthorization();
             var dpd = DependencyPropertyDescriptor.FromProperty(ItemsControl.ItemsSourceProperty, typeof(DataGrid));
-            dpd?.AddValueChanged(ListUsers, ThisIsCalledWhenPropertyIsChanged);
+            dpd?.AddValueChanged(ListUsers, ItemSourcePropertyIsChanged);
         }
-
         private async void PersonellAuthorization()
         {
             while (true)
@@ -55,9 +51,16 @@ namespace BankSystemPersonnel
                         ColorScheme = MetroDialogOptions.ColorScheme,
                         EnablePasswordPreview = true,
                         UsernameWatermark = "Имя пользователя",
-                        PasswordWatermark = "Пароль"
+                        PasswordWatermark = "Пароль",
+                        NegativeButtonVisibility = Visibility.Visible,
+                        NegativeButtonText = "Close",
+                        DialogResultOnCancel = MessageDialogResult.Canceled
                     });
-                if (dialres is null) continue;
+                if (dialres is null)
+                {
+                    this.Close();
+                    return;
+                }
                 var acc = DBBSContext.GetInstance().PersonnelAccounts
                     .FirstOrDefault(a => a.Login == dialres.Username && a.Password == dialres.Password);
                 if (acc is null)
@@ -70,8 +73,7 @@ namespace BankSystemPersonnel
                 }
             }
         }
-
-        private void ThisIsCalledWhenPropertyIsChanged(object sender, EventArgs e)
+        private void ItemSourcePropertyIsChanged(object sender, EventArgs e)
         {
             if (ListUsers.ItemsSource is ObservableCollection<User>)
             {
@@ -114,12 +116,12 @@ namespace BankSystemPersonnel
                 ShowLimitMenuItem.Visibility = Visibility.Collapsed;
             }
         }
-
         void SetDBData()
         {
             BankAccount bankAccount1 = new BankAccount
             {
                 Created = DateTime.Now.AddMonths(-2),
+                Number = "1234567898765432",
                 CreditFunds = 0m,
                 PersonalFunds = -3000m,
                 IsClosed = false
@@ -127,6 +129,7 @@ namespace BankSystemPersonnel
             BankAccount bankAccount5 = new BankAccount
             {
                 Created = DateTime.Now.AddMonths(-1),
+                Number = "1234567898765433",
                 CreditFunds = 501000m,
                 PersonalFunds = 0m,
                 IsClosed = false
@@ -137,7 +140,7 @@ namespace BankSystemPersonnel
                 IsBlocked = false,
                 Login = "valentpopov",
                 Password = "123456789",
-                BankAccounts = new[] { bankAccount1,bankAccount5 },
+                BankAccounts = new[] { bankAccount1, bankAccount5 },
                 AccountLimit = new AccountLimit()
             };
             User user1 = new User
@@ -151,6 +154,7 @@ namespace BankSystemPersonnel
             BankAccount bankAccount2 = new BankAccount
             {
                 Created = DateTime.Now.AddMonths(-3),
+                Number = "1234567898765434",
                 CreditFunds = 5000m,
                 PersonalFunds = 30000m,
                 IsClosed = false
@@ -158,6 +162,7 @@ namespace BankSystemPersonnel
             BankAccount bankAccount3 = new BankAccount
             {
                 Created = DateTime.Now.AddMonths(-1),
+                Number = "1234567898765435",
                 CreditFunds = 1000m,
                 PersonalFunds = 1000m,
                 IsClosed = false
@@ -165,6 +170,7 @@ namespace BankSystemPersonnel
             BankAccount bankAccount4 = new BankAccount
             {
                 Created = DateTime.Now.AddMonths(-1),
+                Number = "1234567898765436",
                 CreditFunds = -1000m,
                 PersonalFunds = 1000m,
                 IsClosed = false
@@ -201,28 +207,23 @@ namespace BankSystemPersonnel
             DBBSContext.GetInstance().PersonnelAccounts.Add(pAcc);
             DBBSContext.GetInstance().SaveChanges();
         }
-
         private void SearchUser_OnClick(object sender, RoutedEventArgs e)
         {
             _itemSourceBackUp = ListUsers.ItemsSource;
             ListUsers.ItemsSource = personell.SearchUsers(SearchQueryBox.Text);
         }
-
         private void ShowAllUser_OnClick(object sender, RoutedEventArgs e)
         {
             ObservableCollection<User> users = personell.GetAllUsers();
             _itemSourceBackUp = ListUsers.ItemsSource;
             ListUsers.ItemsSource = users;
         }
-
         private void ShowAllAccounts_OnClick(object sender, RoutedEventArgs e)
         {
             ObservableCollection<Account> accounts = personell.GetAllAccounts();
             _itemSourceBackUp = ListUsers.ItemsSource;
             ListUsers.ItemsSource = accounts;
         }
-
-
         private void ShowAccountMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             if (ListUsers.SelectedItem is User)
@@ -241,17 +242,16 @@ namespace BankSystemPersonnel
                 ListUsers.ItemsSource = personell.SearchAccount(ListUsers.SelectedItem as CreditRequest);
             }
         }
-
         private async void ListUsers_OnCellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-           if (e.EditAction == DataGridEditAction.Commit)
+            if (e.EditAction == DataGridEditAction.Commit)
             {
                 MetroDialogSettings settings = new MetroDialogSettings
                 {
                     AffirmativeButtonText = "OK",
                 };
                 DBBSContext ctx = DBBSContext.GetInstance();
-                int row=ctx.SaveChanges();
+                int row = ctx.SaveChanges();
                 var msg = await this.ShowMessageAsync("Изменение данных", $"Изменения успешно сохранены {row} row aff",
                     MessageDialogStyle.Affirmative, settings);
             }
@@ -274,7 +274,6 @@ namespace BankSystemPersonnel
             }
 
         }
-
         private void ShowBankAccountMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
 
@@ -284,7 +283,7 @@ namespace BankSystemPersonnel
                 _itemSourceBackUp = ListUsers.ItemsSource;
                 ListUsers.ItemsSource = personell.SearchBankAccount(user);
             }
-            else if(ListUsers.SelectedItem is Account)
+            else if (ListUsers.SelectedItem is Account)
             {
                 Account account = ListUsers.SelectedItem as Account;
                 _itemSourceBackUp = ListUsers.ItemsSource;
@@ -296,19 +295,16 @@ namespace BankSystemPersonnel
                 ListUsers.ItemsSource = personell.SearchBankAccount(ListUsers.SelectedItem as CreditRequest);
             }
         }
-
         private void SearchAccount_OnClick(object sender, RoutedEventArgs e)
         {
             _itemSourceBackUp = ListUsers.ItemsSource;
             ListUsers.ItemsSource = personell.SearchAccount(SearchQueryBox.Text);
         }
-
         private void ShowAllDebtor_OnClick(object sender, RoutedEventArgs e)
         {
             _itemSourceBackUp = ListUsers.ItemsSource;
             ListUsers.ItemsSource = personell.SearchAllDebtors();
         }
-
         private void ShowUserMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             if (ListUsers.SelectedItem is Account)
@@ -327,25 +323,21 @@ namespace BankSystemPersonnel
                 ListUsers.ItemsSource = personell.SearchUsers(ListUsers.SelectedItem as CreditRequest);
             }
         }
-
         private void BackMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             if (_itemSourceBackUp != null)
                 ListUsers.ItemsSource = _itemSourceBackUp;
         }
-
         private void ShowAllVIPClients_OnClick(object sender, RoutedEventArgs e)
         {
             _itemSourceBackUp = ListUsers.ItemsSource;
             ListUsers.ItemsSource = personell.SearchAllVIPClients();
         }
-
         private void ShowActualCreditRequests_OnClick(object sender, RoutedEventArgs e)
         {
             _itemSourceBackUp = ListUsers.ItemsSource;
             ListUsers.ItemsSource = personell.ShowCreditRequests();
         }
-
         private void ShowLimitMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             if (ListUsers.SelectedItem is Account)
@@ -360,30 +352,28 @@ namespace BankSystemPersonnel
     {
         private static string _connStr;
         private static DBBSContext _dbBankSystemControl;
-
         public static void InitializeDBControl()
         {
             _connStr = ConfigurationManager.ConnectionStrings["defaultConnection"].ConnectionString;
             _dbBankSystemControl = DBBSContext.GetInstance(_connStr);
             _dbBankSystemControl.Database.Initialize(true);
         }
-
         public ObservableCollection<User> SearchUsers(string searchQuery)
         {
-            return new ObservableCollection<User>( _dbBankSystemControl.Users.Where(user =>
-               user.FirstName.Contains(searchQuery) || 
-               user.LastName.Contains(searchQuery) || 
-               user.BirthDate.ToString().Contains(searchQuery)
+            return new ObservableCollection<User>(_dbBankSystemControl.Users.Where(user =>
+              user.FirstName.Contains(searchQuery) ||
+              user.LastName.Contains(searchQuery) ||
+              user.BirthDate.ToString().Contains(searchQuery)
                ).ToList());
         }
         public ObservableCollection<User> SearchUsers(Account account)
         {
-            return new ObservableCollection<User>( _dbBankSystemControl.Users.Where(user => user.AccountId == account.Id).ToList());
+            return new ObservableCollection<User>(_dbBankSystemControl.Users.Where(user => user.AccountId == account.Id).ToList());
         }
         public ObservableCollection<User> SearchUsers(BankAccount bankAccount)
         {
             var accounts = _dbBankSystemControl.Accounts.FirstOrDefault(acc => acc.BankAccounts.Any(b => b.Id == bankAccount.Id));
-            return new ObservableCollection<User>( _dbBankSystemControl.Users.Where(user => user.AccountId == accounts.Id).ToList());
+            return new ObservableCollection<User>(_dbBankSystemControl.Users.Where(user => user.AccountId == accounts.Id).ToList());
         }
         public ObservableCollection<User> SearchUsers(CreditRequest creditRequest)
         {
@@ -391,8 +381,8 @@ namespace BankSystemPersonnel
         }
         public ObservableCollection<Account> SearchAccount(User user)
         {
-            return new ObservableCollection<Account>( _dbBankSystemControl.Accounts.Where(account =>
-                user.AccountId == account.Id).ToList());
+            return new ObservableCollection<Account>(_dbBankSystemControl.Accounts.Where(account =>
+               user.AccountId == account.Id).ToList());
         }
         public ObservableCollection<Account> SearchAccount(BankAccount bankAccount)
         {
@@ -404,53 +394,48 @@ namespace BankSystemPersonnel
         }
         public ObservableCollection<Account> SearchAccount(string searchQuery)
         {
-            return new ObservableCollection<Account>( _dbBankSystemControl.Accounts.Where(account =>
-                account.Login.Contains(searchQuery) || 
-                account.Created.ToString().Contains(searchQuery)
+            return new ObservableCollection<Account>(_dbBankSystemControl.Accounts.Where(account =>
+               account.Login.Contains(searchQuery) ||
+               account.Created.ToString().Contains(searchQuery)
                 ).ToList());
-        }
-
-        public ObservableCollection<User> GetAllUsers()
-        {
-            return new ObservableCollection<User>( _dbBankSystemControl.Users.ToList());
-        }
-        public ObservableCollection<Account> GetAllAccounts()
-        {
-            return new ObservableCollection<Account>( _dbBankSystemControl.Accounts.ToList());
         }
         public ObservableCollection<BankAccount> SearchBankAccount(User user)
         {
             return SearchBankAccount(_dbBankSystemControl.Accounts.FirstOrDefault(account =>
                 user.AccountId == account.Id));
         }
-
         public ObservableCollection<BankAccount> SearchBankAccount(Account account)
         {
             return new ObservableCollection<BankAccount>(account.BankAccounts.ToList());
         }
         public ObservableCollection<BankAccount> SearchBankAccount(CreditRequest creditRequest)
         {
-            return new ObservableCollection<BankAccount>(_dbBankSystemControl.BankAccounts.Where(c=>c.Id==creditRequest.BankAccountId).ToList());
+            return new ObservableCollection<BankAccount>(_dbBankSystemControl.BankAccounts.Where(c => c.Id == creditRequest.BankAccountId).ToList());
+        }
+        public ObservableCollection<User> GetAllUsers()
+        {
+            return new ObservableCollection<User>(_dbBankSystemControl.Users.ToList());
+        }
+        public ObservableCollection<Account> GetAllAccounts()
+        {
+            return new ObservableCollection<Account>(_dbBankSystemControl.Accounts.ToList());
         }
         public ObservableCollection<BankAccount> SearchAllDebtors()
         {
-            return new ObservableCollection<BankAccount> (_dbBankSystemControl.BankAccounts.Where(a => a.CreditFunds < 0 || a.PersonalFunds < 0).ToList());
+            return new ObservableCollection<BankAccount>(_dbBankSystemControl.BankAccounts.Where(a => a.CreditFunds < 0 || a.PersonalFunds < 0).ToList());
         }
         public ObservableCollection<BankAccount> SearchAllVIPClients()
         {
-            return new ObservableCollection<BankAccount>(_dbBankSystemControl.BankAccounts.Where(a => (a.PersonalFunds+a.CreditFunds) > 500000m).ToList());
+            return new ObservableCollection<BankAccount>(_dbBankSystemControl.BankAccounts.Where(a => (a.PersonalFunds + a.CreditFunds) > 500000m).ToList());
         }
-
         public ObservableCollection<CreditRequest> ShowCreditRequests()
         {
             return new ObservableCollection<CreditRequest>(_dbBankSystemControl.CreditRequests.Where(r => r.IsClosed == false).ToList());
         }
-
         public ObservableCollection<AccountLimit> ShowAccountLimit(Account account)
         {
-            return new ObservableCollection<AccountLimit>(_dbBankSystemControl.AccountLimits.Where(a => a.Id==account.Id).ToList());
+            return new ObservableCollection<AccountLimit>(_dbBankSystemControl.AccountLimits.Where(a => a.Id == account.Id).ToList());
         }
-
         public void AddUser(User user, Account account, BankAccount bankAccount)
         {
             _dbBankSystemControl.Users.Add(user);

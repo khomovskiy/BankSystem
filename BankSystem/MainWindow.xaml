@@ -1,12 +1,143 @@
-﻿<Window x:Class="BankSystem.MainWindow"
+﻿<mah:MetroWindow x:Class="BankSystem.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BankSystem"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Bank System Client" MinHeight="450" MinWidth="600" Height="Auto" Width="Auto">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" ></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel Margin="5"
+                    Grid.Column="0">
+            <Button x:Name="ShowBankAccountsButton"
+                    Click="ShowBankAccountsButton_OnClick"
+                    Margin="0,2,0,2">Показать счета</Button>
+            <Button x:Name="TransferButton"
+                    Click="TransferButton_OnClick"
+                    Margin="0,2,0,2">Перевод средств</Button>
+
+            <Button x:Name="ShowCreditRequests"
+                    Click="ShowCreditRequests_OnClick"
+                    Margin="0,2,0,2">Заявки на кредит</Button>
+        </StackPanel>
+        <Border Grid.Row="0" 
+                Grid.Column="1"
+                BorderThickness="3"
+                BorderBrush="LightGray"
+                Margin="5">
+            <Grid>
+                <StackPanel x:Name="BankAccountListPanel"
+                    Orientation="Horizontal"
+                    Grid.Column="1">
+                    <ListView x:Name="BankAccountList"
+                          SelectionChanged="BankAccountList_OnSelectionChanged"
+                          MinWidth="200">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border
+                                BorderThickness="3"
+                                BorderBrush="LightGray"
+                                Margin="5">
+                                    <StackPanel>
+                                        <TextBlock x:Name="NumberBox"
+                                           Text="{Binding Path=Number}"
+                                           Background="LightGray"></TextBlock>
+                                        <TextBlock x:Name="PersonalFundsBox"
+                                           Text="{Binding Path=PersonalFunds, StringFormat=Личные средства :{0} грн}"/>
+                                        <TextBlock x:Name="CreditFundsBox"
+                                           Text="{Binding Path=CreditFunds, StringFormat=Кредитные средства :{0} грн}"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <Border x:Name="BankAccountBorder"
+                    Visibility="Collapsed"
+                    BorderThickness="3"
+                    BorderBrush="LightGray"
+                    Margin="5">
+                        <StackPanel x:Name="BankAccountPanel">
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="BlockBankAccount"
+                                Click="BlockBankAccount_OnClick"
+                                Margin="5">Заблокировать счет</Button>
+                                <Button x:Name="CashToCard"
+                                    Click="CashToCard_OnClick"
+                                    Margin="5">Пополнить счет</Button>
+                                <Border BorderThickness="3"
+                                        BorderBrush="LightGray"
+                                        Margin="5">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button x:Name="CreditRequestButton"
+                                    Click="CreditRequestButton_OnClick"
+                                    Margin="5">Взять кредит</Button>
+                                        <Button x:Name="PayToCredit"
+                                    Click="PayToCredit_OnClick"
+                                    Margin="5">Погасить кредит</Button>
+                                        <TextBox x:Name="CreditAmountTxtBox"
+                                         Margin="5"
+                                         mah:TextBoxHelper.Watermark="Сумма кредита"></TextBox>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                            <DataGrid x:Name="TransactionHistoryDataGrid"
+                                  Margin="5"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+                <StackPanel x:Name="TransferPanel"
+                            Visibility="Collapsed">
+                    <TextBlock Margin="5" >Перевести со счета:</TextBlock>
+                    <ComboBox x:Name="TransferFromComboBox"
+                              Margin="5">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} ({1}, {2})">
+                                            <Binding Path="Number" />
+                                            <Binding Path="PersonalFunds" />
+                                            <Binding Path="CreditFunds" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Margin="5">на счет:</TextBlock>
+                    <ComboBox x:Name="TransferToComboBox"
+                              IsEditable="True"
+                              SelectedValuePath="Number"
+                              Margin="5">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} ({1}, {2})">
+                                            <Binding Path="Number" />
+                                            <Binding Path="PersonalFunds" />
+                                            <Binding Path="CreditFunds" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBox x:Name="AmountTextBox"
+                             mah:TextBoxHelper.Watermark="Сумма перевода"
+                             Margin="5"/>
+                    <Button x:Name="BeginTransferButton"
+                            Click="BeginTransferButton_OnClick"
+                            Margin="5">Начать перевод</Button>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
-</Window>
+
+</mah:MetroWindow>
+
