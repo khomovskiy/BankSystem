@@ -72,10 +72,14 @@
                         <MenuItem Header="Назад"
                               x:Name="BackMenuItem"
                               Click="BackMenuItem_OnClick"></MenuItem>
+                        <MenuItem Header="Показать лимит"
+                                  x:Name="ShowLimitMenuItem"
+                                  Click="ShowLimitMenuItem_OnClick"></MenuItem>
                     </ContextMenu>
                 </DataGrid.ContextMenu>
             </DataGrid>
         </Border>
+        
     </Grid>
 </mah:MetroWindow>
 

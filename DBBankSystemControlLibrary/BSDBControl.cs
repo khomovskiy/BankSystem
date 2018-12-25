@@ -40,7 +40,13 @@ namespace DBBankSystemControlLibrary
         public DateTime Created { get; set; }
         public virtual ICollection<BankAccount> BankAccounts { get; set; }
         public AccountLimit AccountLimit { get; set; }
-        
+        [Index(IsUnique = true)]
+        public int? AccountLimitId { get; set; }
+
+        public Account()
+        {
+            AccountLimit = new AccountLimit();
+        }
     }
 
     public class User
@@ -59,6 +65,7 @@ namespace DBBankSystemControlLibrary
         public Account Account { get; set; }
         [Index(IsUnique = true)]
         public int? AccountId { get; set; }
+        
 
         
     }
@@ -76,7 +83,6 @@ namespace DBBankSystemControlLibrary
     public class AccountLimit
     {
         public int Id { get; set; }
-        public DateTime Created { get; set; }
         public decimal CashLimit { get; set; } 
         public decimal TranferLimit { get; set; }
         

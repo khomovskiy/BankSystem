@@ -37,7 +37,7 @@ namespace BankSystemPersonnel
         {
             PersonellControl.InitializeDBControl();
             InitializeComponent();
-            SetDBData();
+            //SetDBData();
         }
 
         void SetDBData()
@@ -62,7 +62,7 @@ namespace BankSystemPersonnel
                 IsBlocked = false,
                 Login = "valentpopov",
                 Password = "123456789",
-                BankAccounts = new[] { bankAccount1,bankAccount5 }
+                BankAccounts = new[] { bankAccount1,bankAccount5 },
             };
             User user1 = new User
             {
@@ -99,7 +99,7 @@ namespace BankSystemPersonnel
                 IsBlocked = false,
                 Login = "uivanov",
                 Password = "123456789",
-                BankAccounts = new[] { bankAccount2, bankAccount3, bankAccount4 }
+                BankAccounts = new[] { bankAccount2, bankAccount3, bankAccount4 },
             };
             User user2 = new User
             {
@@ -172,8 +172,6 @@ namespace BankSystemPersonnel
                     MessageDialogStyle.Affirmative, settings);
             }
         }
-
-
         private void ListUsers_OnAutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
         {
             if (e.PropertyType == typeof(Account) || e.PropertyName.Contains("Id") || e.PropertyName.Contains("Account") || e.PropertyName.Contains("Password"))
@@ -263,6 +261,15 @@ namespace BankSystemPersonnel
             _itemSourceBackUp = ListUsers.ItemsSource;
             ListUsers.ItemsSource = personell.ShowCreditRequests();
         }
+
+        private void ShowLimitMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (ListUsers.SelectedItem is Account)
+            {
+                _itemSourceBackUp = ListUsers.ItemsSource;
+                ListUsers.ItemsSource = personell.ShowAccountLimit(ListUsers.SelectedItem as Account);
+            }
+        }
     }
 
     public class PersonellControl
@@ -275,10 +282,6 @@ namespace BankSystemPersonnel
             _connStr = ConfigurationManager.ConnectionStrings["defaultConnection"].ConnectionString;
             _dbBankSystemControl = DBBSContext.GetInstance(_connStr);
             _dbBankSystemControl.Database.Initialize(true);
-
-
-
-            
         }
 
         public ObservableCollection<User> SearchUsers(string searchQuery)
@@ -343,9 +346,8 @@ namespace BankSystemPersonnel
         }
         public ObservableCollection<BankAccount> SearchBankAccount(CreditRequest creditRequest)
         {
-            return new ObservableCollection<BankAccount>(_dbBankSystemControl.BankAccounts.Where(c=>c.Id==creditRequest.BankAccount.Id).ToList());
+            return new ObservableCollection<BankAccount>(_dbBankSystemControl.BankAccounts.Where(c=>c.Id==creditRequest.BankAccountId).ToList());
         }
-
         public ObservableCollection<BankAccount> SearchAllDebtors()
         {
             return new ObservableCollection<BankAccount> (_dbBankSystemControl.BankAccounts.Where(a => a.CreditFunds < 0 || a.PersonalFunds < 0).ToList());
@@ -360,7 +362,10 @@ namespace BankSystemPersonnel
             return new ObservableCollection<CreditRequest>(_dbBankSystemControl.CreditRequests.Where(r => r.IsClosed == false).ToList());
         }
 
-
+        public ObservableCollection<AccountLimit> ShowAccountLimit(Account account)
+        {
+            return new ObservableCollection<AccountLimit>(_dbBankSystemControl.AccountLimits.Where(a => a.Id==account.Id).ToList());
+        }
 
         public void AddUser(User user, Account account, BankAccount bankAccount)
         {
