@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Configuration;
 using System.Data.Entity;
 using System.Globalization;
@@ -38,6 +39,55 @@ namespace BankSystemPersonnel
             PersonellControl.InitializeDBControl();
             InitializeComponent();
             //SetDBData();
+            var dpd = DependencyPropertyDescriptor.FromProperty(ItemsControl.ItemsSourceProperty, typeof(DataGrid));
+            if (dpd != null)
+            {
+                dpd.AddValueChanged(ListUsers, ThisIsCalledWhenPropertyIsChanged);
+            }
+        }
+
+        private void ThisIsCalledWhenPropertyIsChanged(object sender, EventArgs e)
+        {
+            if (ListUsers.ItemsSource is ObservableCollection<User>)
+            {
+                ShowUserMenuItem.Visibility = Visibility.Collapsed;
+                ShowAccountMenuItem.Visibility = Visibility.Visible;
+                ShowBankAccountMenuItem.Visibility = Visibility.Visible;
+                BackMenuItem.Visibility = Visibility.Visible;
+                ShowLimitMenuItem.Visibility = Visibility.Collapsed;
+            }
+            else if (ListUsers.ItemsSource is ObservableCollection<Account>)
+            {
+                ShowUserMenuItem.Visibility = Visibility.Visible;
+                ShowAccountMenuItem.Visibility = Visibility.Collapsed;
+                ShowBankAccountMenuItem.Visibility = Visibility.Visible;
+                BackMenuItem.Visibility = Visibility.Visible;
+                ShowLimitMenuItem.Visibility = Visibility.Visible;
+            }
+            else if (ListUsers.ItemsSource is ObservableCollection<BankAccount>)
+            {
+                ShowUserMenuItem.Visibility = Visibility.Visible;
+                ShowAccountMenuItem.Visibility = Visibility.Visible;
+                ShowBankAccountMenuItem.Visibility = Visibility.Collapsed;
+                BackMenuItem.Visibility = Visibility.Visible;
+                ShowLimitMenuItem.Visibility = Visibility.Collapsed;
+            }
+            else if (ListUsers.ItemsSource is ObservableCollection<CreditRequest>)
+            {
+                ShowUserMenuItem.Visibility = Visibility.Visible;
+                ShowAccountMenuItem.Visibility = Visibility.Visible;
+                ShowBankAccountMenuItem.Visibility = Visibility.Visible;
+                BackMenuItem.Visibility = Visibility.Visible;
+                ShowLimitMenuItem.Visibility = Visibility.Collapsed;
+            }
+            else if (ListUsers.ItemsSource is ObservableCollection<AccountLimit>)
+            {
+                ShowUserMenuItem.Visibility = Visibility.Collapsed;
+                ShowAccountMenuItem.Visibility = Visibility.Collapsed;
+                ShowBankAccountMenuItem.Visibility = Visibility.Collapsed;
+                BackMenuItem.Visibility = Visibility.Visible;
+                ShowLimitMenuItem.Visibility = Visibility.Collapsed;
+            }
         }
 
         void SetDBData()
@@ -63,6 +113,7 @@ namespace BankSystemPersonnel
                 Login = "valentpopov",
                 Password = "123456789",
                 BankAccounts = new[] { bankAccount1,bankAccount5 },
+                AccountLimit = new AccountLimit()
             };
             User user1 = new User
             {
@@ -100,6 +151,7 @@ namespace BankSystemPersonnel
                 Login = "uivanov",
                 Password = "123456789",
                 BankAccounts = new[] { bankAccount2, bankAccount3, bankAccount4 },
+                AccountLimit = new AccountLimit()
             };
             User user2 = new User
             {

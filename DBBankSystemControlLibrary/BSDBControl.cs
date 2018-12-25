@@ -42,11 +42,6 @@ namespace DBBankSystemControlLibrary
         public AccountLimit AccountLimit { get; set; }
         [Index(IsUnique = true)]
         public int? AccountLimitId { get; set; }
-
-        public Account()
-        {
-            AccountLimit = new AccountLimit();
-        }
     }
 
     public class User
